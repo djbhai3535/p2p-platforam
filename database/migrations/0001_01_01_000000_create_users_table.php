@@ -11,12 +11,41 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('languages', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('code')->unique(); // e.g., 'en', 'ur'
+            $table->string('direction')->default('ltr'); // 'ltr' or 'rtl'
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_default')->default(false);
+            $table->timestamps();
+        });
+
+        Schema::create('countries', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('iso_code')->unique(); // e.g., 'PK', 'US'
+            $table->string('currency_code'); // e.g., 'PKR', 'USD'
+            $table->string('currency_symbol'); // e.g., '₨', '$'
+            $table->string('phone_code'); // e.g., '+92', '+1'
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            $table->foreignId('language_id')->nullable()->constrained('languages')->nullOnDelete();
+            $table->text('two_factor_secret')->nullable();
+            $table->text('two_factor_recovery_codes')->nullable();
+            $table->timestamp('two_factor_confirmed_at')->nullable();
+            $table->boolean('is_admin')->default(false);
+            $table->boolean('is_active')->default(true);
+            $table->timestamp('last_seen_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
@@ -29,7 +58,7 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            $table->foreignUuid('user_id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');
@@ -42,8 +71,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('countries');
+        Schema::dropIfExists('languages');
     }
 };
