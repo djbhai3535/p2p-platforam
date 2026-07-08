@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AuditLog;
 use App\Models\KycVerification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class KycController extends Controller
 {
@@ -77,5 +78,29 @@ class KycController extends Controller
         ]);
 
         return redirect()->route('profile.kyc')->with('status', 'Your identity verification documents have been submitted successfully.');
+    }
+
+    /**
+     * Securely view/stream KYC documents for administrators.
+     */
+    public function viewDocument(KycVerification $kycVerification, string $type)
+    {
+        // Only allow admin access
+        if (!auth()->user()->is_admin) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $path = match($type) {
+            'front' => $kycVerification->front_image_path,
+            'back' => $kycVerification->back_image_path,
+            'selfie' => $kycVerification->selfie_image_path,
+            default => abort(404, 'Document type not found.')
+        };
+
+        if (!$path || !Storage::disk('local')->exists($path)) {
+            abort(404, 'File does not exist.');
+        }
+
+        return response()->file(storage_path('app/' . $path));
     }
 }

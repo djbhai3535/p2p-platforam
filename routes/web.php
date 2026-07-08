@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
         // KYC Verification
         Route::get('/profile/kyc', [KycController::class, 'index'])->name('profile.kyc');
         Route::post('/profile/kyc', [KycController::class, 'submit'])->name('profile.kyc.submit');
+        Route::get('/profile/kyc/document/{kycVerification}/{type}', [KycController::class, 'viewDocument'])->name('profile.kyc.document');
 
         // P2P Marketplace / Other Pages placeholders
         Route::get('/marketplace', function () {
