@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\KycController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\P2PController;
 use App\Http\Controllers\UserPaymentMethodController;
 use Illuminate\Support\Facades\Route;
@@ -69,16 +70,23 @@ Route::middleware('auth')->group(function () {
         Route::get('/marketplace', [P2PController::class, 'marketplace'])->name('marketplace');
         Route::get('/my-ads', [P2PController::class, 'myAdvertisements'])->name('advertisements.my');
 
+        Route::get('/my-trades', [OrderController::class, 'myTrades'])->name('orders.my');
+
         // KYC Gated P2P Actions
         Route::middleware('kyc.verified')->group(function () {
             Route::get('/advertisements/create', [P2PController::class, 'createAdvertisement'])->name('advertisements.create');
             Route::post('/advertisements', [P2PController::class, 'storeAdvertisement'])->name('advertisements.store');
             Route::post('/advertisements/{advertisement}/toggle', [P2PController::class, 'toggleAdvertisement'])->name('advertisements.toggle');
-        });
 
-        Route::get('/my-trades', function () {
-            return "My Trades Page Placeholder";
-        })->name('orders.my');
+            // Order trading room & action flows
+            Route::get('/orders/create/{advertisement}', [OrderController::class, 'create'])->name('orders.create');
+            Route::post('/orders/store/{advertisement}', [OrderController::class, 'store'])->name('orders.store');
+            Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+            Route::post('/orders/{order}/paid', [OrderController::class, 'markAsPaid'])->name('orders.paid');
+            Route::post('/orders/{order}/release', [OrderController::class, 'release'])->name('orders.release');
+            Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+            Route::post('/orders/{order}/dispute', [OrderController::class, 'openDispute'])->name('orders.dispute');
+        });
 
         Route::get('/wallet', function () {
             return "Wallet Page Placeholder";
