@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\KycController;
+use App\Http\Controllers\P2PController;
+use App\Http\Controllers\UserPaymentMethodController;
 use Illuminate\Support\Facades\Route;
 
 // Guest Routes (Authentication)
@@ -58,14 +60,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/profile/kyc', [KycController::class, 'submit'])->name('profile.kyc.submit');
         Route::get('/profile/kyc/document/{kycVerification}/{type}', [KycController::class, 'viewDocument'])->name('profile.kyc.document');
 
-        // P2P Marketplace / Other Pages placeholders
-        Route::get('/marketplace', function () {
-            return "P2P Marketplace Page Placeholder";
-        })->name('marketplace');
+        // Linked Payment Methods
+        Route::get('/profile/payment-methods', [UserPaymentMethodController::class, 'index'])->name('profile.payment-methods');
+        Route::post('/profile/payment-methods', [UserPaymentMethodController::class, 'store'])->name('profile.payment-methods.store');
+        Route::delete('/profile/payment-methods/{paymentMethod}', [UserPaymentMethodController::class, 'destroy'])->name('profile.payment-methods.destroy');
 
-        Route::get('/my-ads', function () {
-            return "My Ads Page Placeholder";
-        })->name('advertisements.my');
+        // P2P Marketplace General Views
+        Route::get('/marketplace', [P2PController::class, 'marketplace'])->name('marketplace');
+        Route::get('/my-ads', [P2PController::class, 'myAdvertisements'])->name('advertisements.my');
+
+        // KYC Gated P2P Actions
+        Route::middleware('kyc.verified')->group(function () {
+            Route::get('/advertisements/create', [P2PController::class, 'createAdvertisement'])->name('advertisements.create');
+            Route::post('/advertisements', [P2PController::class, 'storeAdvertisement'])->name('advertisements.store');
+            Route::post('/advertisements/{advertisement}/toggle', [P2PController::class, 'toggleAdvertisement'])->name('advertisements.toggle');
+        });
 
         Route::get('/my-trades', function () {
             return "My Trades Page Placeholder";

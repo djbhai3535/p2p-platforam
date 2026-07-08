@@ -65,6 +65,11 @@ class AdvertisementResource extends Resource
                                 'paused' => 'Paused',
                             ])
                             ->required(),
+                        Forms\Components\Select::make('payment_method_ids')
+                            ->label('Payment Methods')
+                            ->multiple()
+                            ->options(\App\Models\PaymentMethod::all()->pluck('name', 'id'))
+                            ->required(),
                         Forms\Components\Textarea::make('terms')
                             ->maxLength(65535)
                             ->columnSpanFull(),
@@ -114,6 +119,12 @@ class AdvertisementResource extends Resource
                         'paused' => 'warning',
                     })
                     ->sortable(),
+                Tables\Columns\TextColumn::make('payment_method_ids')
+                    ->label('Payment Options')
+                    ->formatStateUsing(function ($state) {
+                        if (empty($state)) return 'None';
+                        return \App\Models\PaymentMethod::whereIn('id', $state)->pluck('name')->join(', ');
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

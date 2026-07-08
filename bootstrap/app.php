@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'email.verified' => \App\Http\Middleware\RequireEmailVerified::class,
+            'kyc.verified' => \App\Http\Middleware\RequireKyc::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'api/payments/nowpayments/webhook',

@@ -57,4 +57,12 @@ class Advertisement extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * Get the resolved payment method models collection.
+     */
+    public function getPaymentMethodsAttribute()
+    {
+        return PaymentMethod::whereIn('id', $this->payment_method_ids ?? [])->get();
+    }
 }
