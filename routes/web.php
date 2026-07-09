@@ -96,8 +96,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/wallet', function () {
             return "Wallet Page Placeholder";
         })->name('wallet');
+
     });
 });
+
+// Public Locale & Country Context Toggles
+Route::get('/language/{locale}', function ($locale) {
+    session()->put('locale', $locale);
+    return redirect()->back();
+})->name('locale.set');
+
+Route::get('/country/{country_id}', function ($country_id) {
+    if (\App\Models\Country::where('id', $country_id)->exists()) {
+        session()->put('country_id', $country_id);
+    }
+    return redirect()->back();
+})->name('country.set');
 
 // Redirect root to dashboard
 Route::get('/', function () {
