@@ -38,7 +38,7 @@ class LogSuccessfulLogin
         AuditLog::create([
             'user_id' => $user->id,
             'action' => 'LOGIN',
-            'description' => "User logged in from IP: " . ($this->request->ip() ?? '127.0.0.1'),
+            'description' => 'User logged in from IP: '.($this->request->ip() ?? '127.0.0.1'),
             'ip_address' => $this->request->ip() ?? '127.0.0.1',
         ]);
     }

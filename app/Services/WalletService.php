@@ -9,15 +9,13 @@ use App\Models\Wallet;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class WalletService
 {
     /**
      * Create a pending deposit transaction and call NOWPayments API.
      *
-     * @param User $user
-     * @param float $amount
-     * @return array
      * @throws Exception
      */
     public function createDeposit(User $user, float $amount): array
@@ -36,10 +34,10 @@ class WalletService
 
         if (empty($apiKey)) {
             // For local development sandbox/simulation if no key is configured
-            $mockAddress = 'T' . \Illuminate\Support\Str::random(33);
+            $mockAddress = 'T'.Str::random(33);
             $transaction->update([
                 'address' => $mockAddress,
-                'payment_id' => 'mock-' . \Illuminate\Support\Str::random(10),
+                'payment_id' => 'mock-'.Str::random(10),
             ]);
 
             return [
@@ -52,7 +50,7 @@ class WalletService
         }
 
         // Call NOWPayments API
-        $url = $sandbox 
+        $url = $sandbox
             ? 'https://api-sandbox.nowpayments.io/v1/payment'
             : 'https://api.nowpayments.io/v1/payment';
 
@@ -70,7 +68,7 @@ class WalletService
 
         if ($response->successful()) {
             $data = $response->json();
-            
+
             $transaction->update([
                 'address' => $data['pay_address'],
                 'payment_id' => $data['payment_id'],
@@ -87,15 +85,12 @@ class WalletService
         }
 
         $transaction->update(['status' => 'rejected']);
-        throw new Exception("NOWPayments API Error: " . $response->body());
+        throw new Exception('NOWPayments API Error: '.$response->body());
     }
 
     /**
      * Process deposit webhook callback.
      *
-     * @param array $payload
-     * @param string $signatureHeader
-     * @return bool
      * @throws Exception
      */
     public function processDepositWebhook(array $payload, string $signatureHeader): bool
@@ -103,14 +98,14 @@ class WalletService
         $ipnSecret = SettingsService::get('nowpayments_ipn_secret');
 
         // Signature validation if secret is set
-        if (!empty($ipnSecret)) {
+        if (! empty($ipnSecret)) {
             // Sort keys alphabetically
             ksort($payload);
             $sortedPayloadJson = json_encode($payload, JSON_UNESCAPED_SLASHES);
             $calculatedSignature = hash_hmac('sha512', $sortedPayloadJson, $ipnSecret);
 
             if ($calculatedSignature !== $signatureHeader) {
-                throw new Exception("NOWPayments webhook signature verification failed.");
+                throw new Exception('NOWPayments webhook signature verification failed.');
             }
         }
 
@@ -119,7 +114,7 @@ class WalletService
         $paymentId = $payload['payment_id'] ?? null;
         $payAmount = $payload['pay_amount'] ?? 0;
 
-        if (!$orderId) {
+        if (! $orderId) {
             return false;
         }
 
@@ -161,10 +156,6 @@ class WalletService
     /**
      * Create a withdrawal request.
      *
-     * @param User $user
-     * @param float $amount
-     * @param string $address
-     * @return Transaction
      * @throws Exception
      */
     public function requestWithdrawal(User $user, float $amount, string $address): Transaction
@@ -174,7 +165,7 @@ class WalletService
 
             // Calculate fees: dynamic settings (e.g. flat withdrawal fee of 2 USDT)
             $withdrawalFeeSetting = DB::table('settings')->where('key', 'withdrawal_fee')->first();
-            $fee = $withdrawalFeeSetting ? (float)$withdrawalFeeSetting->value : 2.0;
+            $fee = $withdrawalFeeSetting ? (float) $withdrawalFeeSetting->value : 2.0;
 
             $totalRequired = bcadd($amount, $fee, 8);
 
@@ -212,8 +203,6 @@ class WalletService
     /**
      * Approve a withdrawal.
      *
-     * @param Transaction $transaction
-     * @return bool
      * @throws Exception
      */
     public function approveWithdrawal(Transaction $transaction): bool
@@ -222,7 +211,7 @@ class WalletService
             $transaction = Transaction::where('id', $transaction->id)->lockForUpdate()->firstOrFail();
 
             if ($transaction->status !== 'pending' || $transaction->type !== 'withdrawal') {
-                throw new Exception("Transaction is not a pending withdrawal.");
+                throw new Exception('Transaction is not a pending withdrawal.');
             }
 
             $transaction->status = 'completed';
@@ -243,8 +232,6 @@ class WalletService
     /**
      * Reject and refund a withdrawal.
      *
-     * @param Transaction $transaction
-     * @return bool
      * @throws Exception
      */
     public function rejectWithdrawal(Transaction $transaction): bool
@@ -253,7 +240,7 @@ class WalletService
             $transaction = Transaction::where('id', $transaction->id)->lockForUpdate()->firstOrFail();
 
             if ($transaction->status !== 'pending' || $transaction->type !== 'withdrawal') {
-                throw new Exception("Transaction is not a pending withdrawal.");
+                throw new Exception('Transaction is not a pending withdrawal.');
             }
 
             $transaction->status = 'rejected';

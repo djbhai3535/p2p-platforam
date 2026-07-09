@@ -15,7 +15,7 @@ class RequireKyc
     {
         $user = $request->user();
 
-        if ($user && !$user->isKycVerified()) {
+        if ($user && ! $user->isKycVerified()) {
             return $request->expectsJson()
                 ? response()->json(['error' => 'KYC verification is required to perform P2P trades.'], 403)
                 : redirect()->route('profile.kyc')->withErrors(['message' => 'You must complete KYC verification before placing trades or creating advertisements.']);

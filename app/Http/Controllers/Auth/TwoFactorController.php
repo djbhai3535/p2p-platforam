@@ -8,6 +8,8 @@ use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,17 +18,17 @@ class TwoFactorController extends Controller
     /**
      * Show 2FA settings page or details.
      */
-    public function index(Request $request): \Illuminate\Contracts\View\View
+    public function index(Request $request): View
     {
         $user = $request->user();
         $qrCodeSvg = null;
         $secret = null;
 
-        if (!$user->two_factor_confirmed_at) {
+        if (! $user->two_factor_confirmed_at) {
             $google2fa = app('pragmarx.google2fa');
-            
+
             // If user doesn't have a secret key yet, generate one
-            if (!$user->two_factor_secret) {
+            if (! $user->two_factor_secret) {
                 $user->two_factor_secret = $google2fa->generateSecretKey();
                 $user->save();
             }
@@ -41,7 +43,7 @@ class TwoFactorController extends Controller
             // Generate QR Code SVG natively
             $renderer = new ImageRenderer(
                 new RendererStyle(200),
-                new SvgImageBackEnd()
+                new SvgImageBackEnd
             );
             $writer = new Writer($renderer);
             $qrCodeSvg = $writer->writeString($qrCodeUrl);
@@ -53,7 +55,7 @@ class TwoFactorController extends Controller
     /**
      * Enable and confirm 2FA for the user.
      */
-    public function enable(Request $request): \Illuminate\Http\RedirectResponse
+    public function enable(Request $request): RedirectResponse
     {
         $request->validate([
             'code' => ['required', 'string', 'min:6', 'max:6'],
@@ -62,7 +64,7 @@ class TwoFactorController extends Controller
 
         $user = $request->user();
 
-        if (!Hash::check($request->password, $user->password)) {
+        if (! Hash::check($request->password, $user->password)) {
             return back()->withErrors(['password' => 'The provided password does not match our records.']);
         }
 
@@ -90,7 +92,7 @@ class TwoFactorController extends Controller
     /**
      * Disable 2FA for the user.
      */
-    public function disable(Request $request): \Illuminate\Http\RedirectResponse
+    public function disable(Request $request): RedirectResponse
     {
         $request->validate([
             'password' => ['required', 'string'],
@@ -99,7 +101,7 @@ class TwoFactorController extends Controller
 
         $user = $request->user();
 
-        if (!Hash::check($request->password, $user->password)) {
+        if (! Hash::check($request->password, $user->password)) {
             return back()->withErrors(['password' => 'The provided password does not match our records.']);
         }
 

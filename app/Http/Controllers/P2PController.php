@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Advertisement;
 use App\Models\Country;
 use App\Models\PaymentMethod;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,11 +15,11 @@ class P2PController extends Controller
     /**
      * Display the P2P Marketplace ads list with filters.
      */
-    public function marketplace(Request $request): \Illuminate\Contracts\View\View
+    public function marketplace(Request $request): View
     {
         $countries = Country::where('is_active', true)->get();
         $userCountry = $request->user() ? $request->user()->country : Country::where('iso_code', 'PK')->first();
-        
+
         $selectedCountryId = $request->input('country_id', $userCountry->id ?? null);
         $type = $request->input('type', 'buy'); // buy or sell ads
         $amount = $request->input('amount');
@@ -41,7 +43,7 @@ class P2PController extends Controller
         // Filter by transaction size limits
         if ($amount) {
             $query->where('min_limit', '<=', $amount)
-                  ->where('max_limit', '>=', $amount);
+                ->where('max_limit', '>=', $amount);
         }
 
         $ads = $query->orderBy('rate', $type === 'buy' ? 'asc' : 'desc')->paginate(10);
@@ -60,16 +62,17 @@ class P2PController extends Controller
     /**
      * Display current user's advertisements.
      */
-    public function myAdvertisements(Request $request): \Illuminate\Contracts\View\View
+    public function myAdvertisements(Request $request): View
     {
         $ads = $request->user()->advertisements()->with(['country', 'paymentMethods'])->get();
+
         return view('p2p.my-ads', compact('ads'));
     }
 
     /**
      * Show form to create a new P2P advertisement.
      */
-    public function createAdvertisement(Request $request): \Illuminate\Contracts\View\View
+    public function createAdvertisement(Request $request): View
     {
         $countries = Country::where('is_active', true)->get();
         // User payment options linked
@@ -81,12 +84,12 @@ class P2PController extends Controller
     /**
      * Store new P2P advertisement.
      */
-    public function storeAdvertisement(Request $request): \Illuminate\Http\RedirectResponse
+    public function storeAdvertisement(Request $request): RedirectResponse
     {
         $user = $request->user();
 
         // KYC check middleware is also active, but double safeguard
-        if (!$user->isKycVerified()) {
+        if (! $user->isKycVerified()) {
             return redirect()->route('profile.kyc')->withErrors(['message' => 'KYC verification is required.']);
         }
 
@@ -133,7 +136,7 @@ class P2PController extends Controller
     /**
      * Pause / Activate advertisement.
      */
-    public function toggleAdvertisement(Advertisement $advertisement, Request $request): \Illuminate\Http\RedirectResponse
+    public function toggleAdvertisement(Advertisement $advertisement, Request $request): RedirectResponse
     {
         if ($advertisement->user_id !== $request->user()->id) {
             abort(403);

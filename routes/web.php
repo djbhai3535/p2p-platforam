@@ -10,6 +10,7 @@ use App\Http\Controllers\KycController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\P2PController;
 use App\Http\Controllers\UserPaymentMethodController;
+use App\Models\Country;
 use Illuminate\Support\Facades\Route;
 
 // Guest Routes (Authentication)
@@ -94,7 +95,7 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::get('/wallet', function () {
-            return "Wallet Page Placeholder";
+            return 'Wallet Page Placeholder';
         })->name('wallet');
 
     });
@@ -103,13 +104,15 @@ Route::middleware('auth')->group(function () {
 // Public Locale & Country Context Toggles
 Route::get('/language/{locale}', function ($locale) {
     session()->put('locale', $locale);
+
     return redirect()->back();
 })->name('locale.set');
 
 Route::get('/country/{country_id}', function ($country_id) {
-    if (\App\Models\Country::where('id', $country_id)->exists()) {
+    if (Country::where('id', $country_id)->exists()) {
         session()->put('country_id', $country_id);
     }
+
     return redirect()->back();
 })->name('country.set');
 

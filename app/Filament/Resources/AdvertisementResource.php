@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AdvertisementResource\Pages;
 use App\Models\Advertisement;
+use App\Models\PaymentMethod;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -68,12 +69,12 @@ class AdvertisementResource extends Resource
                         Forms\Components\Select::make('payment_method_ids')
                             ->label('Payment Methods')
                             ->multiple()
-                            ->options(\App\Models\PaymentMethod::all()->pluck('name', 'id'))
+                            ->options(PaymentMethod::all()->pluck('name', 'id'))
                             ->required(),
                         Forms\Components\Textarea::make('terms')
                             ->maxLength(65535)
                             ->columnSpanFull(),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 
@@ -122,8 +123,11 @@ class AdvertisementResource extends Resource
                 Tables\Columns\TextColumn::make('payment_method_ids')
                     ->label('Payment Options')
                     ->formatStateUsing(function ($state) {
-                        if (empty($state)) return 'None';
-                        return \App\Models\PaymentMethod::whereIn('id', $state)->pluck('name')->join(', ');
+                        if (empty($state)) {
+                            return 'None';
+                        }
+
+                        return PaymentMethod::whereIn('id', $state)->pluck('name')->join(', ');
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

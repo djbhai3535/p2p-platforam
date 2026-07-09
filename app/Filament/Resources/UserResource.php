@@ -3,9 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Models\User;
 use App\Models\Country;
 use App\Models\Language;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,7 +17,7 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    
+
     protected static ?string $navigationGroup = 'User Management';
 
     public static function form(Form $form): Form
@@ -50,7 +50,7 @@ class UserResource extends Resource
                         Forms\Components\Toggle::make('is_active')
                             ->label('Account Active')
                             ->default(true),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 

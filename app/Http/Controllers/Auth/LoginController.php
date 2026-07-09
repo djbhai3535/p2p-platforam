@@ -6,18 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\SettingsService;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
-use PragmaRX\Google2FALaravel\Support\Authenticator;
 
 class LoginController extends Controller
 {
     /**
      * Show the login form.
      */
-    public function show(): \Illuminate\Contracts\View\View
+    public function show(): View
     {
         return view('auth.login');
     }
@@ -25,7 +26,7 @@ class LoginController extends Controller
     /**
      * Handle user login.
      */
-    public function login(Request $request): \Illuminate\Http\RedirectResponse
+    public function login(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
             'email' => ['required', 'string', 'email'],
@@ -35,7 +36,7 @@ class LoginController extends Controller
         // reCAPTCHA verification
         if (SettingsService::get('recaptcha_enabled') === 'true') {
             $recaptchaResponse = $request->input('g-recaptcha-response');
-            if (!$recaptchaResponse) {
+            if (! $recaptchaResponse) {
                 return back()->withErrors(['g-recaptcha-response' => 'Please complete the reCAPTCHA challenge.'])->withInput();
             }
 
@@ -45,7 +46,7 @@ class LoginController extends Controller
                 'remoteip' => $request->ip(),
             ]);
 
-            if (!$verify->json('success')) {
+            if (! $verify->json('success')) {
                 return back()->withErrors(['g-recaptcha-response' => 'reCAPTCHA verification failed.'])->withInput();
             }
         }
@@ -55,7 +56,7 @@ class LoginController extends Controller
 
         if ($user && Auth::validate($credentials)) {
             // Check if user is active
-            if (!$user->is_active) {
+            if (! $user->is_active) {
                 return back()->withErrors(['email' => 'Your account has been deactivated.'])->withInput();
             }
 
@@ -70,7 +71,7 @@ class LoginController extends Controller
 
             // Normal login
             Auth::login($user, $request->boolean('remember'));
-            
+
             // Trigger login event to log device history & audits
             event(new Login('web', $user, $request->boolean('remember')));
 
@@ -85,9 +86,9 @@ class LoginController extends Controller
     /**
      * Show the 2FA input challenge page.
      */
-    public function showTwoFactor(): \Illuminate\Http\RedirectResponse|\Illuminate\Contracts\View\View
+    public function showTwoFactor(): RedirectResponse|View
     {
-        if (!Session::has('login.id')) {
+        if (! Session::has('login.id')) {
             return redirect()->route('login');
         }
 
@@ -97,9 +98,9 @@ class LoginController extends Controller
     /**
      * Verify the 2FA code during login.
      */
-    public function verifyTwoFactor(Request $request): \Illuminate\Http\RedirectResponse
+    public function verifyTwoFactor(Request $request): RedirectResponse
     {
-        if (!Session::has('login.id')) {
+        if (! Session::has('login.id')) {
             return redirect()->route('login');
         }
 
@@ -116,7 +117,7 @@ class LoginController extends Controller
 
         if ($valid) {
             Auth::login($user, Session::get('login.remember', false));
-            
+
             // Trigger login event
             event(new Login('web', $user, Session::get('login.remember', false)));
 
@@ -131,7 +132,7 @@ class LoginController extends Controller
     /**
      * Log user out.
      */
-    public function logout(Request $request): \Illuminate\Http\RedirectResponse
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
 

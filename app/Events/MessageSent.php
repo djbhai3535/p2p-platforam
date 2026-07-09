@@ -27,12 +27,12 @@ class MessageSent implements ShouldBroadcast
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * @return array<int, Channel>
      */
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('order.' . $this->message->order_id),
+            new PrivateChannel('order.'.$this->message->order_id),
         ];
     }
 
@@ -47,7 +47,7 @@ class MessageSent implements ShouldBroadcast
             'sender_id' => $this->message->sender_id,
             'sender_name' => $this->message->sender->name,
             'message' => $this->message->message,
-            'attachment_url' => $this->message->attachment_path ? asset('storage/' . $this->message->attachment_path) : null,
+            'attachment_url' => $this->message->attachment_path ? asset('storage/'.$this->message->attachment_path) : null,
             'created_at' => $this->message->created_at->toIso8601String(),
         ];
     }

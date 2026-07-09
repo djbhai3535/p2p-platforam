@@ -16,8 +16,11 @@ class UserPaymentMethodTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Country $country;
+
     private Language $language;
+
     private PaymentMethod $paymentMethod;
 
     protected function setUp(): void

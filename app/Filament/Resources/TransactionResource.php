@@ -57,7 +57,7 @@ class TransactionResource extends Resource
                         Forms\Components\TextInput::make('payment_id')
                             ->disabled()
                             ->label('External Payment ID'),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 
@@ -126,7 +126,7 @@ class TransactionResource extends Resource
                     ->requiresConfirmation()
                     ->visible(fn ($record) => $record->type === 'withdrawal' && $record->status === 'pending')
                     ->action(function ($record) {
-                        $walletService = new WalletService();
+                        $walletService = new WalletService;
                         $walletService->approveWithdrawal($record);
                     }),
 
@@ -137,7 +137,7 @@ class TransactionResource extends Resource
                     ->requiresConfirmation()
                     ->visible(fn ($record) => $record->type === 'withdrawal' && $record->status === 'pending')
                     ->action(function ($record) {
-                        $walletService = new WalletService();
+                        $walletService = new WalletService;
                         $walletService->rejectWithdrawal($record);
                     }),
 

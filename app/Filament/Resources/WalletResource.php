@@ -3,8 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\WalletResource\Pages;
-use App\Models\Wallet;
 use App\Models\AuditLog;
+use App\Models\Wallet;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -37,7 +37,7 @@ class WalletResource extends Resource
                             ->required()
                             ->numeric()
                             ->default(0.00000000),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 

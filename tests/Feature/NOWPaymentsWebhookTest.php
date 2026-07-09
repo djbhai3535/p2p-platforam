@@ -16,8 +16,11 @@ class NOWPaymentsWebhookTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Country $country;
+
     private Language $language;
+
     private Transaction $transaction;
 
     protected function setUp(): void

@@ -37,11 +37,11 @@ class NOWPaymentsWebhookController extends Controller
 
         try {
             $success = $this->walletService->processDepositWebhook($payload, $signature);
-            
+
             return response()->json(['success' => $success]);
         } catch (Exception $e) {
-            Log::error('NOWPayments webhook processing error: ' . $e->getMessage());
-            
+            Log::error('NOWPayments webhook processing error: '.$e->getMessage());
+
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }

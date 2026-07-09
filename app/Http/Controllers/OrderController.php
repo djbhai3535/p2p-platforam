@@ -8,8 +8,9 @@ use App\Models\Dispute;
 use App\Models\Order;
 use App\Services\EscrowService;
 use Exception;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -24,7 +25,7 @@ class OrderController extends Controller
     /**
      * Display order creation placement page.
      */
-    public function create(Advertisement $advertisement, Request $request): \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
+    public function create(Advertisement $advertisement, Request $request): View|RedirectResponse
     {
         // Block self trading
         if ($advertisement->user_id === $request->user()->id) {
@@ -37,12 +38,12 @@ class OrderController extends Controller
     /**
      * Store new trade order and lock escrow.
      */
-    public function store(Advertisement $advertisement, Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Advertisement $advertisement, Request $request): RedirectResponse
     {
         $user = $request->user();
 
         // Enforce KYC
-        if (!$user->isKycVerified()) {
+        if (! $user->isKycVerified()) {
             return redirect()->route('profile.kyc')->withErrors(['message' => 'KYC verification is required to open a trade.']);
         }
 
@@ -104,7 +105,7 @@ class OrderController extends Controller
     /**
      * Show trade order page (Escrow trade room).
      */
-    public function show(Order $order, Request $request): \Illuminate\Contracts\View\View
+    public function show(Order $order, Request $request): View
     {
         $user = $request->user();
 
@@ -119,7 +120,7 @@ class OrderController extends Controller
     /**
      * Buyer marks trade order as paid.
      */
-    public function markAsPaid(Order $order, Request $request): \Illuminate\Http\RedirectResponse
+    public function markAsPaid(Order $order, Request $request): RedirectResponse
     {
         $user = $request->user();
 
@@ -156,7 +157,7 @@ class OrderController extends Controller
     /**
      * Seller releases USDT from escrow.
      */
-    public function release(Order $order, Request $request): \Illuminate\Http\RedirectResponse
+    public function release(Order $order, Request $request): RedirectResponse
     {
         $user = $request->user();
 
@@ -164,7 +165,7 @@ class OrderController extends Controller
             abort(403);
         }
 
-        if (!in_array($order->status, ['pending', 'paid', 'disputed'])) {
+        if (! in_array($order->status, ['pending', 'paid', 'disputed'])) {
             return back()->withErrors(['message' => 'This trade cannot be released.']);
         }
 
@@ -192,7 +193,7 @@ class OrderController extends Controller
     /**
      * Buyer cancels trade or seller cancels if expired.
      */
-    public function cancel(Order $order, Request $request): \Illuminate\Http\RedirectResponse
+    public function cancel(Order $order, Request $request): RedirectResponse
     {
         $user = $request->user();
 
@@ -233,7 +234,7 @@ class OrderController extends Controller
     /**
      * Open a dispute on a trade order.
      */
-    public function openDispute(Order $order, Request $request): \Illuminate\Http\RedirectResponse
+    public function openDispute(Order $order, Request $request): RedirectResponse
     {
         $user = $request->user();
 
@@ -241,7 +242,7 @@ class OrderController extends Controller
             abort(403);
         }
 
-        if (!in_array($order->status, ['paid', 'pending'])) {
+        if (! in_array($order->status, ['paid', 'pending'])) {
             return back()->withErrors(['message' => 'You can only dispute paid or pending orders.']);
         }
 
@@ -272,13 +273,13 @@ class OrderController extends Controller
     /**
      * List user trades (buyer or seller).
      */
-    public function myTrades(Request $request): \Illuminate\Contracts\View\View
+    public function myTrades(Request $request): View
     {
         $user = $request->user();
         $trades = Order::with(['buyer', 'seller', 'advertisement'])
             ->where(function ($q) use ($user) {
                 $q->where('buyer_id', $user->id)
-                  ->orWhere('seller_id', $user->id);
+                    ->orWhere('seller_id', $user->id);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);

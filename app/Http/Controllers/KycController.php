@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
 use App\Models\KycVerification;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,7 +14,7 @@ class KycController extends Controller
     /**
      * Display the KYC verification status or form.
      */
-    public function index(Request $request): \Illuminate\Contracts\View\View
+    public function index(Request $request): View
     {
         $user = $request->user();
         $kyc = $user->kycVerification;
@@ -23,7 +25,7 @@ class KycController extends Controller
     /**
      * Handle KYC documents submission.
      */
-    public function submit(Request $request): \Illuminate\Http\RedirectResponse
+    public function submit(Request $request): RedirectResponse
     {
         $user = $request->user();
 
@@ -44,7 +46,7 @@ class KycController extends Controller
 
         // Secure file uploads inside the 'local' private storage
         $frontPath = $request->file('front_image')->store('private/kyc');
-        
+
         $backPath = null;
         if ($request->hasFile('back_image')) {
             $backPath = $request->file('back_image')->store('private/kyc');
@@ -86,21 +88,21 @@ class KycController extends Controller
     public function viewDocument(KycVerification $kycVerification, string $type)
     {
         // Only allow admin access
-        if (!auth()->user()->is_admin) {
+        if (! auth()->user()->is_admin) {
             abort(403, 'Unauthorized access.');
         }
 
-        $path = match($type) {
+        $path = match ($type) {
             'front' => $kycVerification->front_image_path,
             'back' => $kycVerification->back_image_path,
             'selfie' => $kycVerification->selfie_image_path,
             default => abort(404, 'Document type not found.')
         };
 
-        if (!$path || !Storage::disk('local')->exists($path)) {
+        if (! $path || ! Storage::disk('local')->exists($path)) {
             abort(404, 'File does not exist.');
         }
 
-        return response()->file(storage_path('app/' . $path));
+        return response()->file(storage_path('app/'.$path));
     }
 }

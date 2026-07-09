@@ -33,7 +33,7 @@ class ChatController extends Controller
                     'sender_id' => $msg->sender_id,
                     'sender_name' => $msg->sender->name,
                     'message' => $msg->message,
-                    'attachment_url' => $msg->attachment_path ? asset('storage/' . $msg->attachment_path) : null,
+                    'attachment_url' => $msg->attachment_path ? asset('storage/'.$msg->attachment_path) : null,
                     'created_at' => $msg->created_at->toIso8601String(),
                 ];
             });
@@ -63,7 +63,7 @@ class ChatController extends Controller
             'attachment' => ['nullable', 'file', 'image', 'max:5120'], // Max 5MB images
         ]);
 
-        if (empty($request->message) && !$request->hasFile('attachment')) {
+        if (empty($request->message) && ! $request->hasFile('attachment')) {
             return response()->json(['error' => 'Cannot send an empty message.'], 400);
         }
 
@@ -90,9 +90,9 @@ class ChatController extends Controller
                 'sender_id' => $message->sender_id,
                 'sender_name' => $user->name,
                 'message' => $message->message,
-                'attachment_url' => $attachmentPath ? asset('storage/' . $attachmentPath) : null,
+                'attachment_url' => $attachmentPath ? asset('storage/'.$attachmentPath) : null,
                 'created_at' => $message->created_at->toIso8601String(),
-            ]
+            ],
         ]);
     }
 }

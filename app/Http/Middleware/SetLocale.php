@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\SettingsService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,17 +24,17 @@ class SetLocale
             }
         } else {
             // Check default setting or fallback
-            $defaultLang = \App\Services\SettingsService::get('default_language', 'en');
+            $defaultLang = SettingsService::get('default_language', 'en');
             app()->setLocale($defaultLang);
             session()->put('locale', $defaultLang);
         }
 
         // 2. Resolve Active Country Context
-        if (!session()->has('country_id')) {
+        if (! session()->has('country_id')) {
             if ($user = $request->user()) {
                 session()->put('country_id', $user->country_id);
             } else {
-                $defaultCountry = \App\Services\SettingsService::get('default_country');
+                $defaultCountry = SettingsService::get('default_country');
                 if ($defaultCountry) {
                     session()->put('country_id', $defaultCountry);
                 }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +18,7 @@ class ForgotPasswordController extends Controller
     /**
      * Show the forgot password form.
      */
-    public function showLinkRequestForm(): \Illuminate\Contracts\View\View
+    public function showLinkRequestForm(): View
     {
         return view('auth.forgot-password');
     }
@@ -24,7 +26,7 @@ class ForgotPasswordController extends Controller
     /**
      * Send password reset link to user.
      */
-    public function sendResetLinkEmail(Request $request): \Illuminate\Http\RedirectResponse
+    public function sendResetLinkEmail(Request $request): RedirectResponse
     {
         $request->validate(['email' => ['required', 'email']]);
 
@@ -51,7 +53,7 @@ class ForgotPasswordController extends Controller
     /**
      * Show reset password form.
      */
-    public function showResetForm(Request $request, $token): \Illuminate\Contracts\View\View
+    public function showResetForm(Request $request, $token): View
     {
         return view('auth.reset-password', [
             'token' => $token,
@@ -62,7 +64,7 @@ class ForgotPasswordController extends Controller
     /**
      * Reset user password.
      */
-    public function reset(Request $request): \Illuminate\Http\RedirectResponse
+    public function reset(Request $request): RedirectResponse
     {
         $request->validate([
             'token' => ['required'],

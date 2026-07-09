@@ -14,7 +14,9 @@ class LocalizationTest extends TestCase
     use RefreshDatabase;
 
     private Country $country;
+
     private Language $language;
+
     private User $user;
 
     protected function setUp(): void
@@ -53,7 +55,7 @@ class LocalizationTest extends TestCase
     {
         $response = $this->get(route('locale.set', 'es'));
         $response->assertRedirect();
-        
+
         $this->assertEquals('es', session('locale'));
     }
 
@@ -72,7 +74,7 @@ class LocalizationTest extends TestCase
 
         // Request dashboard or homepage
         $response = $this->actingAs($this->user)->get(route('marketplace'));
-        
+
         $this->assertEquals('es', app()->getLocale());
     }
 }

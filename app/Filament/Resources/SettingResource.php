@@ -42,7 +42,7 @@ class SettingResource extends Resource
                                 'language' => 'Locales / Languages',
                             ])
                             ->required(),
-                    ])->columns(1)
+                    ])->columns(1),
             ]);
     }
 
@@ -78,7 +78,7 @@ class SettingResource extends Resource
                         'nowpayments' => 'NOWPayments Credentials',
                         'theme' => 'Theme Configurations',
                         'language' => 'Locales / Languages',
-                    ])
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

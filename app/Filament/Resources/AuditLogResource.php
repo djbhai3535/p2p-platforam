@@ -40,7 +40,7 @@ class AuditLogResource extends Resource
                         Forms\Components\DateTimePicker::make('created_at')
                             ->disabled()
                             ->label('Timestamp'),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 
@@ -85,7 +85,7 @@ class AuditLogResource extends Resource
                         'ESCROW_LOCK' => 'Escrow Locks',
                         'ESCROW_RELEASE' => 'Escrow Releases',
                         'ESCROW_REFUND' => 'Escrow Refunds',
-                    ])
+                    ]),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

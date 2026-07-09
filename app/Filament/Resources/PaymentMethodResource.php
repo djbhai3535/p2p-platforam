@@ -3,13 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PaymentMethodResource\Pages;
-use App\Models\PaymentMethod;
 use App\Models\Country;
+use App\Models\PaymentMethod;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class PaymentMethodResource extends Resource
 {
@@ -36,7 +37,7 @@ class PaymentMethodResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->reactive()
-                            ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                            ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
                         Forms\Components\TextInput::make('slug')
                             ->required()
                             ->disabled()
@@ -72,8 +73,8 @@ class PaymentMethodResource extends Resource
                                     ->default(true),
                             ])
                             ->columns(4)
-                            ->default([])
-                    ])
+                            ->default([]),
+                    ]),
             ]);
     }
 

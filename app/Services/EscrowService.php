@@ -15,8 +15,6 @@ class EscrowService
     /**
      * Lock seller's USDT in escrow for a new trade.
      *
-     * @param Order $order
-     * @return Escrow
      * @throws Exception
      */
     public function lock(Order $order): Escrow
@@ -29,7 +27,7 @@ class EscrowService
 
             // Calculate fees: we fetch platform config (default 1% fee if setting is empty)
             $feePercentageSetting = DB::table('settings')->where('key', 'fee_percentage')->first();
-            $feePercent = $feePercentageSetting ? (float)$feePercentageSetting->value : 1.0;
+            $feePercent = $feePercentageSetting ? (float) $feePercentageSetting->value : 1.0;
             $feeUsdt = bcdiv(bcmul($order->amount_usdt, $feePercent, 8), '100', 8);
 
             $totalRequired = bcadd($order->amount_usdt, $feeUsdt, 8);
@@ -68,8 +66,6 @@ class EscrowService
     /**
      * Release USDT from escrow to the buyer's wallet.
      *
-     * @param Order $order
-     * @return bool
      * @throws Exception
      */
     public function release(Order $order): bool
@@ -80,7 +76,7 @@ class EscrowService
                 ->lockForUpdate()
                 ->first();
 
-            if (!$escrow) {
+            if (! $escrow) {
                 throw new Exception("Active escrow lock not found for Order {$order->id}.");
             }
 
@@ -98,7 +94,7 @@ class EscrowService
 
             // Verify seller wallet has enough locked balance
             if (bccomp($sellerWallet->locked_balance, $totalLocked, 8) < 0) {
-                throw new Exception("Inconsistent state: Seller wallet does not have locked balance to release.");
+                throw new Exception('Inconsistent state: Seller wallet does not have locked balance to release.');
             }
 
             // Deduct from seller's locked balance
@@ -139,8 +135,6 @@ class EscrowService
     /**
      * Refund locked escrow balance back to the seller.
      *
-     * @param Order $order
-     * @return bool
      * @throws Exception
      */
     public function refund(Order $order): bool
@@ -151,7 +145,7 @@ class EscrowService
                 ->lockForUpdate()
                 ->first();
 
-            if (!$escrow) {
+            if (! $escrow) {
                 throw new Exception("Active escrow lock not found for Order {$order->id}.");
             }
 
@@ -164,7 +158,7 @@ class EscrowService
 
             // Verify seller wallet has enough locked balance
             if (bccomp($sellerWallet->locked_balance, $totalLocked, 8) < 0) {
-                throw new Exception("Inconsistent state: Seller wallet does not have locked balance to refund.");
+                throw new Exception('Inconsistent state: Seller wallet does not have locked balance to refund.');
             }
 
             // Move funds from locked back to available balance

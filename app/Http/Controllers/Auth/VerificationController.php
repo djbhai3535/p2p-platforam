@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Notifications\EmailOtpNotification;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -12,17 +14,17 @@ class VerificationController extends Controller
     /**
      * Show the OTP email verification notice.
      */
-    public function show(Request $request): \Illuminate\Http\RedirectResponse|\Illuminate\Contracts\View\View
+    public function show(Request $request): RedirectResponse|View
     {
-        return $request->user()->email_verified_at 
-            ? redirect()->route('dashboard') 
+        return $request->user()->email_verified_at
+            ? redirect()->route('dashboard')
             : view('auth.otp');
     }
 
     /**
      * Verify the email OTP code.
      */
-    public function verifyOtp(Request $request): \Illuminate\Http\RedirectResponse
+    public function verifyOtp(Request $request): RedirectResponse
     {
         $request->validate([
             'otp' => ['required', 'string', 'min:6', 'max:6'],
@@ -51,7 +53,7 @@ class VerificationController extends Controller
     /**
      * Resend the verification OTP.
      */
-    public function resend(Request $request): \Illuminate\Http\RedirectResponse
+    public function resend(Request $request): RedirectResponse
     {
         $user = $request->user();
 

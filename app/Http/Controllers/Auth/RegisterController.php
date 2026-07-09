@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\EmailOtpNotification;
 use App\Services\SettingsService;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -18,7 +20,7 @@ class RegisterController extends Controller
     /**
      * Show the registration form.
      */
-    public function show(): \Illuminate\Contracts\View\View
+    public function show(): View
     {
         return view('auth.register');
     }
@@ -26,7 +28,7 @@ class RegisterController extends Controller
     /**
      * Handle user registration.
      */
-    public function register(Request $request): \Illuminate\Http\RedirectResponse
+    public function register(Request $request): RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -38,7 +40,7 @@ class RegisterController extends Controller
         // reCAPTCHA verification
         if (SettingsService::get('recaptcha_enabled') === 'true') {
             $recaptchaResponse = $request->input('g-recaptcha-response');
-            if (!$recaptchaResponse) {
+            if (! $recaptchaResponse) {
                 return back()->withErrors(['g-recaptcha-response' => 'Please complete the reCAPTCHA challenge.'])->withInput();
             }
 
@@ -48,7 +50,7 @@ class RegisterController extends Controller
                 'remoteip' => $request->ip(),
             ]);
 
-            if (!$verify->json('success')) {
+            if (! $verify->json('success')) {
                 return back()->withErrors(['g-recaptcha-response' => 'reCAPTCHA verification failed.'])->withInput();
             }
         }
@@ -67,7 +69,7 @@ class RegisterController extends Controller
         // Generate and send Email OTP
         $otp = (string) rand(100000, 999999);
         Cache::put("otp.{$user->id}", $otp, now()->addMinutes(15));
-        
+
         $user->notify(new EmailOtpNotification($otp));
 
         Auth::login($user);

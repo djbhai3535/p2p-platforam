@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Advertisement;
 use App\Models\Country;
+use App\Models\Dispute;
 use App\Models\KycVerification;
 use App\Models\Language;
+use App\Models\Order;
 use App\Models\PaymentMethod;
 use App\Models\User;
-use App\Models\Advertisement;
-use App\Models\Order;
-use App\Models\Dispute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
@@ -21,10 +21,15 @@ class P2POrderTest extends TestCase
     use RefreshDatabase;
 
     private User $merchant;
+
     private User $buyer;
+
     private Country $country;
+
     private Language $language;
+
     private PaymentMethod $paymentMethod;
+
     private Advertisement $advertisement;
 
     protected function setUp(): void

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\PaymentMethod;
 use App\Models\UserPaymentMethod;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class UserPaymentMethodController extends Controller
@@ -11,7 +13,7 @@ class UserPaymentMethodController extends Controller
     /**
      * Display user's linked payment accounts.
      */
-    public function index(Request $request): \Illuminate\Contracts\View\View
+    public function index(Request $request): View
     {
         $linkedMethods = $request->user()->userPaymentMethods()->with('paymentMethod')->get();
         $availableMethods = PaymentMethod::where('country_id', $request->user()->country_id)
@@ -24,7 +26,7 @@ class UserPaymentMethodController extends Controller
     /**
      * Store linked payment option.
      */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'payment_method_id' => ['required', 'exists:payment_methods,id'],
@@ -33,16 +35,16 @@ class UserPaymentMethodController extends Controller
         ]);
 
         $pm = PaymentMethod::findOrFail($request->payment_method_id);
-        
+
         // Dynamically validate payment fields
         $fields = $pm->fields ?? [];
         $validatedDetails = [];
-        
+
         foreach ($fields as $field) {
             $name = $field['name'];
             $label = $field['label'];
             $isRequired = $field['required'] ?? false;
-            
+
             if ($isRequired && empty($request->input("details.{$name}"))) {
                 return back()->withErrors(["details.{$name}" => "The {$label} field is required."])->withInput();
             }
@@ -65,7 +67,7 @@ class UserPaymentMethodController extends Controller
     /**
      * Delete a user linked payment account.
      */
-    public function destroy(UserPaymentMethod $paymentMethod, Request $request): \Illuminate\Http\RedirectResponse
+    public function destroy(UserPaymentMethod $paymentMethod, Request $request): RedirectResponse
     {
         // Enforce ownership
         if ($paymentMethod->user_id !== $request->user()->id) {

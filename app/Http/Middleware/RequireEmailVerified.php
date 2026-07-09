@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\SettingsService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,9 +16,9 @@ class RequireEmailVerified
     {
         $user = $request->user();
 
-        if ($user && !$user->email_verified_at) {
+        if ($user && ! $user->email_verified_at) {
             // Check if dynamic setting requires verification
-            $verificationRequired = \App\Services\SettingsService::get('email_verification_required', 'false') === 'true';
+            $verificationRequired = SettingsService::get('email_verification_required', 'false') === 'true';
 
             if ($verificationRequired) {
                 return $request->expectsJson()

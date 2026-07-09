@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Country;
 use App\Models\Language;
 use App\Models\Setting;
-use App\Models\Transaction;
 use App\Models\User;
 use App\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,15 +16,18 @@ class WithdrawalTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Country $country;
+
     private Language $language;
+
     private WalletService $walletService;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->walletService = new WalletService();
+        $this->walletService = new WalletService;
 
         // Seed settings
         Setting::create(['key' => 'withdrawal_fee', 'value' => '2.0', 'group' => 'fees']);
@@ -90,7 +92,7 @@ class WithdrawalTest extends TestCase
         $this->user->wallet->update(['available_balance' => 10.00000000]);
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Insufficient balance to request withdrawal");
+        $this->expectExceptionMessage('Insufficient balance to request withdrawal');
 
         // Needs 50 + 2 = 52 USDT
         $this->walletService->requestWithdrawal($this->user, 50.00000000, 'TAddressXYZ');

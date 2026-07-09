@@ -12,6 +12,7 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
     use Queueable;
 
     protected string $token;
+
     protected string $email;
 
     /**

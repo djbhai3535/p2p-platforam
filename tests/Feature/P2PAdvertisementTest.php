@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Advertisement;
 use App\Models\Country;
 use App\Models\KycVerification;
 use App\Models\Language;
 use App\Models\PaymentMethod;
 use App\Models\User;
-use App\Models\Advertisement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -17,8 +17,11 @@ class P2PAdvertisementTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Country $country;
+
     private Language $language;
+
     private PaymentMethod $paymentMethod;
 
     protected function setUp(): void

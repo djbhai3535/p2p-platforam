@@ -16,6 +16,7 @@ class AuthenticationTest extends TestCase
     use RefreshDatabase;
 
     private Country $country;
+
     private Language $language;
 
     protected function setUp(): void
@@ -61,7 +62,7 @@ class AuthenticationTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'test@user.com']);
 
         $user = User::where('email', 'test@user.com')->first();
-        
+
         // Assert wallet was auto-created via booting
         $this->assertNotNull($user->wallet);
         $this->assertEquals('0.00000000', $user->wallet->available_balance);
@@ -94,7 +95,7 @@ class AuthenticationTest extends TestCase
         $this->assertDatabaseHas('device_logins', ['user_id' => $user->id]);
         $this->assertDatabaseHas('audit_logs', [
             'user_id' => $user->id,
-            'action' => 'LOGIN'
+            'action' => 'LOGIN',
         ]);
     }
 
@@ -144,7 +145,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $response->assertRedirect('/dashboard');
-        
+
         $user->refresh();
         $this->assertNotNull($user->email_verified_at);
         $this->assertFalse(Cache::has("otp.{$user->id}"));

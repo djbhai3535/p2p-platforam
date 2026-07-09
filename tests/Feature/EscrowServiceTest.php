@@ -18,17 +18,22 @@ class EscrowServiceTest extends TestCase
     use RefreshDatabase;
 
     private EscrowService $escrowService;
+
     private User $admin;
+
     private User $seller;
+
     private User $buyer;
+
     private Country $country;
+
     private Advertisement $ad;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->escrowService = new EscrowService();
+        $this->escrowService = new EscrowService;
 
         // Seed settings
         Setting::create(['key' => 'fee_percentage', 'value' => '1.5', 'group' => 'fees']);
@@ -100,7 +105,7 @@ class EscrowServiceTest extends TestCase
 
         // Seller currently has 0 available balance
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Insufficient balance to lock in escrow");
+        $this->expectExceptionMessage('Insufficient balance to lock in escrow');
 
         $this->escrowService->lock($order);
     }

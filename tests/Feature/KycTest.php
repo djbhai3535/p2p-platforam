@@ -17,7 +17,9 @@ class KycTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Country $country;
+
     private Language $language;
 
     protected function setUp(): void
@@ -100,7 +102,7 @@ class KycTest extends TestCase
         // Verify audit log creation
         $this->assertDatabaseHas('audit_logs', [
             'user_id' => $this->user->id,
-            'action' => 'KYC_SUBMIT'
+            'action' => 'KYC_SUBMIT',
         ]);
     }
 
@@ -132,7 +134,7 @@ class KycTest extends TestCase
         ]);
 
         $response->assertSessionHasErrors(['message']);
-        
+
         // Assert old record remains unchanged
         $this->assertDatabaseHas('kyc_verifications', [
             'user_id' => $this->user->id,

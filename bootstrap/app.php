@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\RequireEmailVerified;
+use App\Http\Middleware\RequireKyc;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,11 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\SetLocale::class,
+            SetLocale::class,
         ]);
         $middleware->alias([
-            'email.verified' => \App\Http\Middleware\RequireEmailVerified::class,
-            'kyc.verified' => \App\Http\Middleware\RequireKyc::class,
+            'email.verified' => RequireEmailVerified::class,
+            'kyc.verified' => RequireKyc::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'api/payments/nowpayments/webhook',

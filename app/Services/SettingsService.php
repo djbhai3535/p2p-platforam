@@ -9,16 +9,13 @@ class SettingsService
 {
     /**
      * Get a setting value by key.
-     *
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
      */
     public static function get(string $key, mixed $default = null): mixed
     {
         return Cache::rememberForever("setting.{$key}", function () use ($key, $default) {
             try {
                 $setting = Setting::where('key', $key)->first();
+
                 return $setting ? $setting->value : $default;
             } catch (\Throwable $e) {
                 return $default;
@@ -28,11 +25,6 @@ class SettingsService
 
     /**
      * Set/update a setting value by key.
-     *
-     * @param string $key
-     * @param string|null $value
-     * @param string $group
-     * @return Setting
      */
     public static function set(string $key, ?string $value, string $group = 'general'): Setting
     {
@@ -48,8 +40,6 @@ class SettingsService
 
     /**
      * Clear all settings cache.
-     *
-     * @return void
      */
     public static function clearCache(): void
     {

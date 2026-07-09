@@ -58,12 +58,12 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-shopping-bag')
                 ->color('primary'),
 
-            Stat::make('Trading Volume', number_format($volume, 2) . ' USDT')
+            Stat::make('Trading Volume', number_format($volume, 2).' USDT')
                 ->description('Accumulated trading volume')
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('success'),
 
-            Stat::make('Total Revenue', number_format($revenue, 4) . ' USDT')
+            Stat::make('Total Revenue', number_format($revenue, 4).' USDT')
                 ->description('Total platform fees earned')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
@@ -78,12 +78,12 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color($activeDisputes > 0 ? 'danger' : 'gray'),
 
-            Stat::make('Total Deposits', number_format($deposits, 2) . ' USDT')
+            Stat::make('Total Deposits', number_format($deposits, 2).' USDT')
                 ->description('Completed deposits')
                 ->descriptionIcon('heroicon-m-arrow-down-tray')
                 ->color('success'),
 
-            Stat::make('Total Withdrawals', number_format($withdrawals, 2) . ' USDT')
+            Stat::make('Total Withdrawals', number_format($withdrawals, 2).' USDT')
                 ->description('Completed withdrawals')
                 ->descriptionIcon('heroicon-m-arrow-up-tray')
                 ->color('danger'),

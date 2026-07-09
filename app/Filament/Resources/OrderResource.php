@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\AuditLog;
 use App\Models\Order;
-use App\Models\Dispute;
 use App\Services\EscrowService;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -57,7 +56,7 @@ class OrderResource extends Resource
                         Forms\Components\Placeholder::make('payment_screenshot')
                             ->label('Payment Screenshot')
                             ->content(fn ($record) => $record && $record->payment_screenshot
-                                ? new HtmlString("<a href='" . asset('storage/' . $record->payment_screenshot) . "' target='_blank'><img src='" . asset('storage/' . $record->payment_screenshot) . "' style='max-height: 300px; border-radius: 8px;' /></a>")
+                                ? new HtmlString("<a href='".asset('storage/'.$record->payment_screenshot)."' target='_blank'><img src='".asset('storage/'.$record->payment_screenshot)."' style='max-height: 300px; border-radius: 8px;' /></a>")
                                 : 'No screenshot uploaded'
                             ),
                     ]),
@@ -68,7 +67,7 @@ class OrderResource extends Resource
                         Forms\Components\Placeholder::make('dispute_status')
                             ->label('Disputed')
                             ->content(fn ($record) => $record && $record->dispute
-                                ? new HtmlString("<span class='text-danger fw-bold'>Dispute opened by: " . $record->dispute->user->name . "</span>")
+                                ? new HtmlString("<span class='text-danger fw-bold'>Dispute opened by: ".$record->dispute->user->name.'</span>')
                                 : 'No active dispute'
                             ),
                         Forms\Components\Placeholder::make('dispute_reason')
@@ -80,10 +79,10 @@ class OrderResource extends Resource
                         Forms\Components\Placeholder::make('dispute_resolution')
                             ->label('Resolution Details')
                             ->content(fn ($record) => $record && $record->dispute && $record->dispute->resolved_at
-                                ? "Resolved by Admin ID: {$record->dispute->resolved_by} on {$record->dispute->resolved_at} (Result: " . strtoupper($record->dispute->resolution) . ")"
+                                ? "Resolved by Admin ID: {$record->dispute->resolved_by} on {$record->dispute->resolved_at} (Result: ".strtoupper($record->dispute->resolution).')'
                                 : 'Unresolved / Open'
                             ),
-                    ])->visible(fn ($record) => $record && $record->dispute !== null)
+                    ])->visible(fn ($record) => $record && $record->dispute !== null),
             ]);
     }
 
@@ -137,7 +136,7 @@ class OrderResource extends Resource
                         'completed' => 'Completed',
                         'disputed' => 'Disputed',
                         'cancelled' => 'Cancelled',
-                    ])
+                    ]),
             ])
             ->actions([
                 Tables\Actions\Action::make('resolve_release')
@@ -147,7 +146,7 @@ class OrderResource extends Resource
                     ->requiresConfirmation()
                     ->visible(fn ($record) => in_array($record->status, ['disputed', 'paid', 'pending']) && $record->escrow && $record->escrow->status === 'locked')
                     ->action(function ($record) {
-                        $escrowService = new EscrowService();
+                        $escrowService = new EscrowService;
                         $escrowService->release($record);
 
                         $record->update([
@@ -178,7 +177,7 @@ class OrderResource extends Resource
                     ->requiresConfirmation()
                     ->visible(fn ($record) => in_array($record->status, ['disputed', 'paid', 'pending']) && $record->escrow && $record->escrow->status === 'locked')
                     ->action(function ($record) {
-                        $escrowService = new EscrowService();
+                        $escrowService = new EscrowService;
                         $escrowService->refund($record);
 
                         $record->update([

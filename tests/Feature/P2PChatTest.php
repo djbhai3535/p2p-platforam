@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Events\MessageSent;
 use App\Models\Advertisement;
 use App\Models\Country;
 use App\Models\KycVerification;
@@ -10,7 +11,6 @@ use App\Models\Order;
 use App\Models\OrderMessage;
 use App\Models\PaymentMethod;
 use App\Models\User;
-use App\Events\MessageSent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -23,8 +23,11 @@ class P2PChatTest extends TestCase
     use RefreshDatabase;
 
     private User $buyer;
+
     private User $seller;
+
     private User $unrelatedUser;
+
     private Order $order;
 
     protected function setUp(): void
