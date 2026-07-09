@@ -134,19 +134,35 @@
             @endif
         </div>
     </div>
-
-    <!-- Right Column: Chat Room Placeholder (Real-time features in Stage 7) -->
+    
+    <!-- Right Column: Chat Room -->
     <div class="col-lg-4">
-        <div class="glass-card d-flex flex-column h-100" style="min-height: 450px;">
-            <h5 class="fw-bold mb-3 text-primary">Trade Chat</h5>
-            <div class="chat-messages-container flex-grow-1 border border-secondary rounded p-3 mb-3 text-muted-custom small" style="background-color: rgba(0,0,0,0.1); max-height: 350px; overflow-y: auto;">
-                <div class="text-center text-muted-custom py-4">System: Escrow locked. Communication chat is open. Stay inside this chat for secure records.</div>
+        <div class="glass-card d-flex flex-column h-100" style="min-height: 500px;">
+            <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-2 mb-3">
+                <h5 class="fw-bold mb-0 text-primary">Trade Chat</h5>
+                <span id="chat-peer-status" class="badge bg-secondary">Offline</span>
             </div>
             
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Type a message..." disabled>
-                <button class="btn btn-primary" type="button" disabled>Send</button>
+            <div id="chat-messages-container" class="chat-messages-container flex-grow-1 border border-secondary rounded p-3 mb-3" style="background-color: rgba(0,0,0,0.15); height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+                <div class="text-center text-muted-custom py-4 small">System: Escrow locked. Chat communication is active. Keep all deals here.</div>
             </div>
+
+            <!-- Form -->
+            <form id="chat-send-form" enctype="multipart/form-data">
+                @csrf
+                <div class="input-group">
+                    <input type="text" id="chat-message-input" class="form-control" placeholder="Type a message..." style="background-color: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); color: #fff;">
+                    <label class="btn btn-outline-secondary mb-0 d-flex align-items-center justify-content-center" style="cursor: pointer;">
+                        📎
+                        <input type="file" id="chat-attachment-input" name="attachment" style="display: none;" accept="image/*">
+                    </label>
+                    <button class="btn btn-primary px-4" type="submit" id="chat-send-btn">Send</button>
+                </div>
+                <div id="attachment-preview" class="small text-muted-custom mt-1" style="display: none;">
+                    Selected attachment: <span id="attachment-filename"></span> 
+                    <button type="button" class="btn btn-link btn-sm text-danger p-0 ms-2" id="clear-attachment-btn">Remove</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -204,12 +220,14 @@
 @endsection
 
 @section('scripts')
-@if($order->status === 'pending')
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const timerLabel = document.getElementById('countdown-timer');
+document.addEventListener('DOMContentLoaded', function () {
+    // ----------------------------------------------------
+    // 1. Countdown Timer Logic
+    // ----------------------------------------------------
+    const timerLabel = document.getElementById('countdown-timer');
+    if (timerLabel) {
         const expiryTime = new Date('{{ $order->expiry_at->toIso8601String() }}').getTime();
-
         const interval = setInterval(function () {
             const now = new Date().getTime();
             const distance = expiryTime - now;
@@ -227,7 +245,218 @@
 
             timerLabel.innerText = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
         }, 1000);
+    }
+
+    // ----------------------------------------------------
+    // 2. Real-time P2P Trade Chat Room Logic
+    // ----------------------------------------------------
+    const orderId = '{{ $order->id }}';
+    const currentUserId = '{{ Auth::id() }}';
+    const fetchUrl = '{{ route("orders.chat.messages", $order->id) }}';
+    const sendUrl = '{{ route("orders.chat.send", $order->id) }}';
+    
+    const messagesContainer = document.getElementById('chat-messages-container');
+    const sendForm = document.getElementById('chat-send-form');
+    const messageInput = document.getElementById('chat-message-input');
+    const attachmentInput = document.getElementById('chat-attachment-input');
+    const attachmentPreview = document.getElementById('attachment-preview');
+    const attachmentFilename = document.getElementById('attachment-filename');
+    const clearAttachmentBtn = document.getElementById('clear-attachment-btn');
+    const sendBtn = document.getElementById('chat-send-btn');
+    const peerStatusBadge = document.getElementById('chat-peer-status');
+
+    let fallbackInterval = null;
+    let isWebsocketConnected = false;
+
+    // Scroll to bottom
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // File selection preview
+    attachmentInput.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            attachmentFilename.textContent = this.files[0].name;
+            attachmentPreview.style.display = 'block';
+        } else {
+            attachmentPreview.style.display = 'none';
+        }
     });
+
+    clearAttachmentBtn.addEventListener('click', function() {
+        attachmentInput.value = '';
+        attachmentPreview.style.display = 'none';
+    });
+
+    // Render message bubble
+    function renderMessage(msg) {
+        if (document.getElementById(`msg-${msg.id}`)) {
+            return;
+        }
+
+        const msgDiv = document.createElement('div');
+        msgDiv.id = `msg-${msg.id}`;
+        
+        const isSelf = String(msg.sender_id) === String(currentUserId);
+        
+        msgDiv.style.display = 'flex';
+        msgDiv.style.flexDirection = 'column';
+        msgDiv.style.alignItems = isSelf ? 'flex-end' : 'flex-start';
+        msgDiv.style.width = '100%';
+        msgDiv.style.marginBottom = '12px';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'p-2 rounded px-3 small';
+        bubble.style.maxWidth = '85%';
+        bubble.style.wordBreak = 'break-word';
+
+        if (isSelf) {
+            bubble.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+            bubble.style.border = '1px solid rgba(59, 130, 246, 0.4)';
+            bubble.style.color = '#fff';
+            bubble.style.borderRadius = '12px 12px 2px 12px';
+        } else {
+            bubble.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+            bubble.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            bubble.style.color = '#e2e8f0';
+            bubble.style.borderRadius = '12px 12px 12px 2px';
+        }
+
+        if (msg.message) {
+            const textNode = document.createElement('p');
+            textNode.className = 'mb-1';
+            textNode.textContent = msg.message;
+            bubble.appendChild(textNode);
+        }
+
+        if (msg.attachment_url) {
+            const imgLink = document.createElement('a');
+            imgLink.href = msg.attachment_url;
+            imgLink.target = '_blank';
+            
+            const img = document.createElement('img');
+            img.src = msg.attachment_url;
+            img.style.maxWidth = '200px';
+            img.style.maxHeight = '200px';
+            img.style.borderRadius = '6px';
+            img.style.marginTop = '6px';
+            img.style.border = '1px solid rgba(255,255,255,0.1)';
+            img.style.display = 'block';
+            
+            imgLink.appendChild(img);
+            bubble.appendChild(imgLink);
+        }
+
+        const footer = document.createElement('span');
+        footer.className = 'text-muted small mt-1';
+        footer.style.fontSize = '0.7rem';
+        
+        const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        footer.textContent = `${msg.sender_name} • ${time}`;
+
+        msgDiv.appendChild(bubble);
+        msgDiv.appendChild(footer);
+        messagesContainer.appendChild(msgDiv);
+        scrollToBottom();
+    }
+
+    // Fetch messages AJAX
+    function fetchMessages() {
+        fetch(fetchUrl)
+            .then(res => res.json())
+            .then(data => {
+                // Clear default placeholder on first fetch if messages exist
+                if (data.length > 0) {
+                    const placeholder = messagesContainer.querySelector('.text-center');
+                    if (placeholder) placeholder.remove();
+                }
+                data.forEach(msg => {
+                    renderMessage(msg);
+                });
+            })
+            .catch(err => console.error("Error fetching messages:", err));
+    }
+
+    // Initial load
+    fetchMessages();
+
+    // 3. WebSocket / Laravel Echo Configuration
+    if (window.Echo) {
+        window.Echo.private(`order.${orderId}`)
+            .listen('.App.Events.MessageSent', (e) => {
+                const placeholder = messagesContainer.querySelector('.text-center');
+                if (placeholder) placeholder.remove();
+                renderMessage(e);
+            })
+            .listen('MessageSent', (e) => {
+                const placeholder = messagesContainer.querySelector('.text-center');
+                if (placeholder) placeholder.remove();
+                renderMessage(e);
+            });
+        
+        isWebsocketConnected = true;
+        peerStatusBadge.textContent = 'Active (Real-time)';
+        peerStatusBadge.className = 'badge bg-success';
+        console.log("WebSocket connected to trade channel.");
+    }
+
+    // 4. Polling Fallback (polls every 3 seconds if Echo is offline or not installed)
+    if (!isWebsocketConnected) {
+        console.warn("WebSocket not available. Falling back to HTTP polling.");
+        peerStatusBadge.textContent = 'Active (Polling)';
+        peerStatusBadge.className = 'badge bg-warning text-dark';
+        fallbackInterval = setInterval(fetchMessages, 3000);
+    }
+
+    // Form Submit handling
+    sendForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const messageText = messageInput.value.trim();
+        const hasFile = attachmentInput.files.length > 0;
+
+        if (!messageText && !hasFile) {
+            return;
+        }
+
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending...';
+
+        const formData = new FormData();
+        formData.append('_token', '{{ csrf_token() }}');
+        if (messageText) formData.append('message', messageText);
+        if (hasFile) formData.append('attachment', attachmentInput.files[0]);
+
+        fetch(sendUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send';
+            if (data.success) {
+                const placeholder = messagesContainer.querySelector('.text-center');
+                if (placeholder) placeholder.remove();
+                
+                messageInput.value = '';
+                attachmentInput.value = '';
+                attachmentPreview.style.display = 'none';
+                renderMessage(data.message);
+            } else {
+                alert(data.error || 'Failed to send message.');
+            }
+        })
+        .catch(err => {
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send';
+            console.error("Error sending message:", err);
+            alert('Failed to send message.');
+        });
+    });
+});
 </script>
-@endif
 @endsection

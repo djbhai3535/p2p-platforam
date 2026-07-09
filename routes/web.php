@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Auth\VerificationController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\KycController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\P2PController;
@@ -86,6 +87,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/orders/{order}/release', [OrderController::class, 'release'])->name('orders.release');
             Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
             Route::post('/orders/{order}/dispute', [OrderController::class, 'openDispute'])->name('orders.dispute');
+
+            // Order Chat Room Real-time endpoints
+            Route::get('/orders/{order}/messages', [ChatController::class, 'fetchMessages'])->name('orders.chat.messages');
+            Route::post('/orders/{order}/messages', [ChatController::class, 'sendMessage'])->name('orders.chat.send');
         });
 
         Route::get('/wallet', function () {
