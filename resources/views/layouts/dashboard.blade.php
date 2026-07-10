@@ -7,35 +7,39 @@
 
     <title>@yield('title', 'Dashboard') - {{ App\Services\SettingsService::get('platform_name', 'TradeFlow P2P') }}</title>
 
-    <!-- Google Fonts (Outfit) -->
+    <!-- Google Fonts (Plus Jakarta Sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <!-- Custom CSS (Premium Bybit-Inspired Dark theme & Glassmorphism) -->
+    <!-- Custom CSS (Premium Binance/Bybit Inspired Dark Charcoal & Orange Theme) -->
     <style>
         :root {
-            --bg-color: #0c1015;
-            --nav-bg: rgba(18, 25, 34, 0.85);
-            --card-bg: rgba(22, 30, 41, 0.7);
-            --border-color: rgba(255, 255, 255, 0.06);
-            --text-color: #f1f5f9;
-            --text-muted: #64748b;
-            --accent-purple: #6c5ce7;
-            --accent-blue: #0072ff;
-            --btn-gradient: linear-gradient(135deg, #6366f1, #a855f7);
-            --btn-hover: linear-gradient(135deg, #4f46e5, #9333ea);
+            --bg-color: #0b0c0e;
+            --nav-bg: rgba(18, 20, 24, 0.92);
+            --card-bg: rgba(28, 30, 36, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-color: #f5f6f7;
+            --text-muted: #848e9c;
+            --accent-orange: #f39c12;
+            --accent-amber: #e67e22;
+            --accent-gold: #f1c40f;
+            --btn-gradient: linear-gradient(135deg, #ff9f43, #f39c12);
+            --btn-hover: linear-gradient(135deg, #e67e22, #d35400);
+            --success-color: #0ecb81;
+            --danger-color: #f6465d;
+            --warning-color: #f3ba2f;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.08) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(243, 156, 18, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(230, 126, 34, 0.05) 0px, transparent 50%);
             background-attachment: fixed;
             color: var(--text-color);
             min-height: 100vh;
@@ -44,74 +48,93 @@
         /* Navbar */
         .navbar-custom {
             background-color: var(--nav-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border-color);
-            padding: 15px 0;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            transition: all 0.3s ease;
         }
 
         .navbar-brand h3 {
-            font-weight: 700;
-            background: linear-gradient(to right, #6366f1, #a855f7, #00c6ff);
+            font-weight: 800;
+            background: linear-gradient(to right, #ff9f43, #f1c40f);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 0;
+            letter-spacing: -0.5px;
         }
 
         .nav-link {
-            color: var(--text-color);
+            color: var(--text-muted);
             font-weight: 500;
-            padding: 8px 16px !important;
+            padding: 8px 18px !important;
             border-radius: 8px;
             transition: all 0.2s ease;
         }
 
-        .nav-link:hover, .nav-link.active {
-            color: #ffffff;
-            background-color: rgba(255, 255, 255, 0.05);
+        .nav-link:hover {
+            color: var(--text-color);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-link.active {
+            color: #ffffff !important;
+            background: rgba(243, 156, 18, 0.12);
+            border: 1px solid rgba(243, 156, 18, 0.2);
         }
 
         /* Card styles */
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 30px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(243, 156, 18, 0.08);
+            border-color: rgba(243, 156, 18, 0.15);
         }
 
         .card-title-custom {
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 20px;
+            color: var(--text-color);
         }
 
         /* Form elements */
         .form-control, .form-select {
-            background-color: rgba(13, 17, 23, 0.8);
+            background-color: rgba(18, 20, 24, 0.8) !important;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-color);
-            padding: 10px 14px;
+            border-radius: 10px;
+            color: var(--text-color) !important;
+            padding: 12px 16px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .form-control:focus, .form-select:focus {
-            background-color: rgba(13, 17, 23, 0.8);
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-            color: var(--text-color);
+            background-color: rgba(18, 20, 24, 0.9) !important;
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
         }
 
         /* Buttons */
         .btn-premium {
             background: var(--btn-gradient);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 16px rgba(243, 156, 18, 0.2);
             transition: all 0.2s ease;
         }
 
@@ -119,16 +142,16 @@
             background: var(--btn-hover);
             color: white;
             transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.35);
         }
 
         .btn-outline-custom {
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             color: var(--text-color);
             background: transparent;
-            padding: 10px 20px;
-            font-weight: 500;
+            padding: 12px 24px;
+            font-weight: 600;
             transition: all 0.2s ease;
         }
 
@@ -141,53 +164,65 @@
         /* Tables */
         .table-custom {
             color: var(--text-color);
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
         }
 
         .table-custom th {
+            background-color: rgba(255, 255, 255, 0.01);
             color: var(--text-muted);
-            font-weight: 500;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
             border-bottom: 2px solid var(--border-color);
-            padding: 15px 10px;
+            padding: 16px 20px;
         }
 
         .table-custom td {
-            padding: 15px 10px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
             vertical-align: middle;
+            transition: background-color 0.2s ease;
+        }
+
+        .table-custom tr:hover td {
+            background-color: rgba(255, 255, 255, 0.015);
         }
 
         /* Balance badge */
         .balance-badge {
-            background-color: rgba(99, 102, 241, 0.15);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            color: #818cf8;
-            padding: 8px 16px;
+            background-color: rgba(243, 156, 18, 0.1);
+            border: 1px solid rgba(243, 156, 18, 0.25);
+            color: var(--accent-orange);
+            padding: 8px 18px;
             border-radius: 20px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
 
         /* Alerts */
         .alert-custom-info {
-            background-color: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.25);
-            color: #93c5fd;
+            background-color: rgba(243, 156, 18, 0.08);
+            border: 1px solid rgba(243, 156, 18, 0.15);
+            color: var(--accent-orange);
             border-radius: 12px;
             padding: 15px 20px;
         }
 
         .alert-custom-success {
-            background-color: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.25);
-            color: #a7f3d0;
+            background-color: rgba(14, 203, 129, 0.08);
+            border: 1px solid rgba(14, 203, 129, 0.15);
+            color: var(--success-color);
             border-radius: 12px;
             padding: 15px 20px;
         }
 
         .alert-custom-danger {
-            background-color: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.25);
-            color: #fca5a5;
+            background-color: rgba(246, 70, 93, 0.08);
+            border: 1px solid rgba(246, 70, 93, 0.15);
+            color: var(--danger-color);
             border-radius: 12px;
             padding: 15px 20px;
         }

@@ -10,6 +10,7 @@ use App\Http\Controllers\KycController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\P2PController;
 use App\Http\Controllers\UserPaymentMethodController;
+use App\Http\Controllers\WalletController;
 use App\Models\Country;
 use Illuminate\Support\Facades\Route;
 
@@ -94,9 +95,9 @@ Route::middleware('auth')->group(function () {
             Route::post('/orders/{order}/messages', [ChatController::class, 'sendMessage'])->name('orders.chat.send');
         });
 
-        Route::get('/wallet', function () {
-            return 'Wallet Page Placeholder';
-        })->name('wallet');
+        Route::get('/wallet', [WalletController::class, 'index'])->name('wallet');
+        Route::post('/wallet/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
+        Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 
     });
 });

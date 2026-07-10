@@ -7,10 +7,10 @@
 
     <title>@yield('title', 'Auth') - {{ config('app.name', 'TradeFlow P2P') }}</title>
 
-    <!-- Google Fonts (Outfit) -->
+    <!-- Google Fonts (Plus Jakarta Sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -18,24 +18,26 @@
     <!-- Custom CSS (Premium Bybit-Inspired Dark theme & Glassmorphism) -->
     <style>
         :root {
-            --bg-color: #0c0e12;
-            --card-bg: rgba(20, 26, 33, 0.65);
+            --bg-color: #0b0c0e;
+            --card-bg: rgba(28, 30, 36, 0.7);
             --border-color: rgba(255, 255, 255, 0.08);
-            --primary-accent: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            --secondary-accent: linear-gradient(135deg, #00c6ff, #0072ff);
-            --text-color: #e2e8f0;
-            --text-muted: #94a3b8;
-            --input-bg: rgba(13, 17, 23, 0.8);
-            --btn-gradient: linear-gradient(135deg, #6366f1, #a855f7);
-            --btn-hover: linear-gradient(135deg, #4f46e5, #9333ea);
+            --text-color: #f5f6f7;
+            --text-muted: #848e9c;
+            --accent-orange: #f39c12;
+            --accent-amber: #e67e22;
+            --btn-gradient: linear-gradient(135deg, #ff9f43, #f39c12);
+            --btn-hover: linear-gradient(135deg, #e67e22, #d35400);
+            --input-bg: rgba(18, 20, 24, 0.8);
+            --success-color: #0ecb81;
+            --danger-color: #f6465d;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 90% 80%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+                radial-gradient(at 10% 20%, rgba(243, 156, 18, 0.06) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(230, 126, 34, 0.06) 0px, transparent 50%);
             background-attachment: fixed;
             color: var(--text-color);
             min-height: 100vh;
@@ -52,8 +54,8 @@
 
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(16px) saturate(120%);
-            -webkit-backdrop-filter: blur(16px) saturate(120%);
+            backdrop-filter: blur(20px) saturate(120%);
+            -webkit-backdrop-filter: blur(20px) saturate(120%);
             border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 40px;
@@ -66,8 +68,8 @@
         }
 
         .brand-logo h2 {
-            font-weight: 700;
-            background: linear-gradient(to right, #6366f1, #a855f7, #00c6ff);
+            font-weight: 800;
+            background: linear-gradient(to right, #ff9f43, #f1c40f);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -1px;
@@ -75,26 +77,25 @@
         }
 
         .form-label {
-            font-weight: 500;
-            font-size: 0.9rem;
+            font-weight: 600;
+            font-size: 0.88rem;
             color: var(--text-color);
             margin-bottom: 8px;
         }
 
         .form-control {
-            background-color: var(--input-bg);
+            background-color: var(--input-bg) !important;
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            color: var(--text-color);
+            color: var(--text-color) !important;
             padding: 12px 16px;
             transition: all 0.3s ease;
         }
 
         .form-control:focus {
-            background-color: var(--input-bg);
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
-            color: var(--text-color);
+            background-color: rgba(18, 20, 24, 0.9) !important;
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
         }
 
         .btn-premium {
@@ -105,13 +106,13 @@
             padding: 12px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
         }
 
         .btn-premium:hover {
             background: var(--btn-hover);
             color: white;
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.35);
             transform: translateY(-1px);
         }
 
@@ -124,27 +125,30 @@
         }
 
         a {
-            color: #a855f7;
+            color: var(--accent-orange);
             text-decoration: none;
             transition: color 0.2s ease;
+            font-weight: 500;
         }
 
         a:hover {
-            color: #c084fc;
+            color: var(--accent-amber);
         }
 
         .alert-custom-danger {
-            background-color: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #fca5a5;
+            background-color: rgba(246, 70, 93, 0.08);
+            border: 1px solid rgba(246, 70, 93, 0.15);
+            color: var(--danger-color);
             border-radius: 10px;
+            padding: 12px 16px;
         }
 
         .alert-custom-success {
-            background-color: rgba(16, 185, 129, 0.2);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #a7f3d0;
+            background-color: rgba(14, 203, 129, 0.08);
+            border: 1px solid rgba(14, 203, 129, 0.15);
+            color: var(--success-color);
             border-radius: 10px;
+            padding: 12px 16px;
         }
     </style>
     @yield('styles')

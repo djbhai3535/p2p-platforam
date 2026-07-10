@@ -37,7 +37,7 @@
                 </div>
                 <div class="col-sm-4 col-12">
                     <span class="text-muted-custom small">Rate</span>
-                    <h4 class="fw-bold text-primary mb-0">{{ number_format($order->rate, 2) }} <span class="fs-6 text-muted-custom">{{ $order->advertisement->country->currency_code }}/USDT</span></h4>
+                    <h4 class="fw-bold text-warning mb-0">{{ number_format($order->rate, 2) }} <span class="fs-6 text-muted-custom">{{ $order->advertisement->country->currency_code }}/USDT</span></h4>
                 </div>
             </div>
 
@@ -58,14 +58,14 @@
                     @endphp
 
                     <div class="mb-4">
-                        <h6 class="fw-bold text-primary mb-3">Seller's Payment Details:</h6>
+                        <h6 class="fw-bold text-warning mb-3">Seller's Payment Details:</h6>
                         @if($paymentAccounts->isEmpty())
                             <p class="text-muted-custom small">Contact seller in chat for payment details.</p>
                         @else
                             <div class="d-flex flex-column gap-2">
                                 @foreach($paymentAccounts as $account)
                                     <div class="p-3 rounded border border-secondary" style="background-color: rgba(255,255,255,0.01);">
-                                        <h6 class="fw-bold text-primary mb-1">{{ $account->paymentMethod->name }}</h6>
+                                        <h6 class="fw-bold text-warning mb-1">{{ $account->paymentMethod->name }}</h6>
                                         <p class="mb-1 small"><strong>Account Title:</strong> {{ $account->account_title }}</p>
                                         @foreach($account->account_details as $k => $v)
                                             <p class="mb-0 small text-muted-custom"><strong>{{ ucfirst(str_replace('_', ' ', $k)) }}:</strong> {{ $v }}</p>
@@ -139,7 +139,7 @@
     <div class="col-lg-4">
         <div class="glass-card d-flex flex-column h-100" style="min-height: 500px;">
             <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-2 mb-3">
-                <h5 class="fw-bold mb-0 text-primary">Trade Chat</h5>
+                <h5 class="fw-bold mb-0 text-warning">Trade Chat</h5>
                 <span id="chat-peer-status" class="badge bg-secondary">Offline</span>
             </div>
             
