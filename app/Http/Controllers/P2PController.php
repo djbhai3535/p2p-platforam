@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Advertisement;
 use App\Models\Country;
 use App\Models\PaymentMethod;
+use App\Services\SettingsService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -146,5 +147,31 @@ class P2PController extends Controller
         $advertisement->update(['status' => $newStatus]);
 
         return redirect()->route('advertisements.my')->with('status', "Advertisement marked as {$newStatus}.");
+    }
+
+    /**
+     * Redirect to the WhatsApp number, Telegram, or Support URL configured in settings.
+     */
+    public function helpRedirect()
+    {
+        $whatsapp = SettingsService::get('whatsapp_number');
+        $telegram = SettingsService::get('telegram_link');
+        $supportUrl = SettingsService::get('support_url');
+
+        if (! empty($supportUrl)) {
+            return redirect()->away($supportUrl);
+        }
+
+        if (! empty($whatsapp)) {
+            $cleanNumber = preg_replace('/[^0-9]/', '', $whatsapp);
+
+            return redirect()->away("https://wa.me/{$cleanNumber}");
+        }
+
+        if (! empty($telegram)) {
+            return redirect()->away($telegram);
+        }
+
+        return redirect()->route('dashboard')->withErrors(['support' => 'No active support link configured. Please contact administration.']);
     }
 }

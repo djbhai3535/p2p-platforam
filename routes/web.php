@@ -117,7 +117,9 @@ Route::get('/country/{country_id}', function ($country_id) {
     return redirect()->back();
 })->name('country.set');
 
-// Redirect root to dashboard
+// Public Landing Page & Help Redirect
 Route::get('/', function () {
-    return redirect()->route('dashboard');
+    return view('welcome');
 });
+
+Route::get('/help', [P2PController::class, 'helpRedirect'])->name('support.help');
