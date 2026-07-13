@@ -321,11 +321,14 @@ class DatabaseSeeder extends Seeder
                     'amount_fiat' => 27850.0,
                     'rate' => 278.50,
                     'status' => 'completed',
+                    'expiry_at' => now()->addMinutes(15),
                 ]);
                 $order->escrow()->create([
-                    'wallet_id' => $users[0]->wallet->id,
-                    'amount' => 100.0,
+                    'seller_wallet_id' => $users[0]->wallet->id,
+                    'amount_usdt' => 100.0,
+                    'fee_usdt' => 1.0,
                     'status' => 'released',
+                    'released_at' => now(),
                 ]);
             }
         }
