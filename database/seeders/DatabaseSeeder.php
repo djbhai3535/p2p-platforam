@@ -255,7 +255,7 @@ class DatabaseSeeder extends Seeder
                 'max_limit' => 400000.0,
                 'payment_method_ids' => $methodsPK,
                 'terms' => 'Instant release after payment confirmation. Meezan Bank / Easypaisa preferred.',
-                'is_active' => true,
+                'status' => 'active',
             ]);
         }
 
@@ -272,7 +272,7 @@ class DatabaseSeeder extends Seeder
                 'max_limit' => 1000000.0,
                 'payment_method_ids' => [$methodsPK[0], $methodsPK[1]],
                 'terms' => 'JazzCash or Easypaisa transfers only. No third party payments allowed.',
-                'is_active' => true,
+                'status' => 'active',
             ]);
         }
 
@@ -289,7 +289,7 @@ class DatabaseSeeder extends Seeder
                 'max_limit' => 200000.0,
                 'payment_method_ids' => $methodsPK,
                 'terms' => 'I am buying USDT. Instant cash transfer will be sent to your bank account.',
-                'is_active' => true,
+                'status' => 'active',
             ]);
         }
 
@@ -306,7 +306,7 @@ class DatabaseSeeder extends Seeder
                 'max_limit' => 5000.0,
                 'payment_method_ids' => $methodsUS,
                 'terms' => 'Quick release for Zelle payments. Fast and secure.',
-                'is_active' => true,
+                'status' => 'active',
             ]);
         }
 
