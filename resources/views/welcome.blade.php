@@ -16,7 +16,7 @@
     // Fetch live ads for preview safely
     $previewAds = collect();
     if (\Illuminate\Support\Facades\Schema::hasTable('advertisements')) {
-        $previewAds = \App\Models\Advertisement::with(['user', 'country', 'paymentMethods'])
+        $previewAds = \App\Models\Advertisement::with(['user', 'country'])
             ->where('status', 'active')
             ->latest()
             ->limit(3)
@@ -437,7 +437,7 @@
                                     </td>
                                     <td>
                                         <div class="d-flex flex-wrap gap-1">
-                                            @foreach($ad->paymentMethods as $pm)
+                                            @foreach($ad->payment_methods as $pm)
                                                 <span class="badge border border-secondary text-muted" style="background-color: rgba(255,255,255,0.03); font-size: 0.75rem;">
                                                     {{ $pm->name }}
                                                 </span>
